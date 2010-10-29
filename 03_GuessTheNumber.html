@@ -1,0 +1,32 @@
+<HTML>
+  <HEAD>
+    <TITLE>Guess The Number</TITLE>
+    <SCRIPT LANGUAGE="JavaScript">
+      function didYouGetIt() {
+          var number = document.getElementById("number").value;
+          //Get a random number from 1 to 10
+          //Math.random() gets a number from 0 to 1
+          //Multiplied by 10 and rounding by defect I get an integer from 0 to 9
+          //Adding 1 I get what I was looking for
+          var newNumber = Math.floor(Math.random()*10)+1;
+          //isNaN(num) returns true if the content is not a valid number
+          //so !isNaN(num) returns true if it IS a number
+          //number!="" check that the variable is not empty
+          if ((!isNaN(number) && number!="")){
+            if(number==newNumber)
+              document.getElementById("writeHere").innerHTML="Great, you got it!";
+            else
+              document.getElementById("writeHere").innerHTML="Wrong. Try again! The number was "+ newNumber;
+          }else
+            alert("Write a valid number from 1 to 10");
+      }
+    </SCRIPT>
+  </HEAD>
+  <BODY>
+    Please enter a number between 1 and 10: <BR>
+    <INPUT TYPE="text" id="number" VALUE="">
+    <INPUT TYPE="button" Value="Click" onClick="didYouGetIt()">
+    <div id="writeHere"></div>
+  </BODY>
+</HTML>
+
