@@ -1,0 +1,25 @@
+<HTML>
+  <HEAD>
+    <TITLE>Test Input</TITLE>
+    <SCRIPT LANGUAGE="JavaScript">
+      function sayHi() {
+          //Here we declare a variable "name" and get the value of the inputtext "username"
+          var name = document.getElementById("username").value;
+          //Check if the user wrote something
+          if(name=="")
+            //if empty show a pop-up
+            alert("Are you scared of telling me your name?");
+          else
+            //Here we modify de div "writeHere" with what we want to tell the user
+            document.getElementById("writeHere").innerHTML="Hi " + name + ", you rock!";
+      }
+    </SCRIPT>
+  </HEAD>
+  <BODY>
+    Please enter your name: <BR>
+    <INPUT TYPE="text" id="username" VALUE="">
+      <!-- the parameter onClick will call our function "sayHi" when the user clicks this button -->
+    <INPUT TYPE="button" Value="Click" onClick="sayHi()">
+    <div id="writeHere"></div>
+  </BODY>
+</HTML>
