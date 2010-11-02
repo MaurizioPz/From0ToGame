@@ -1,0 +1,75 @@
+<HTML>
+  <HEAD>
+    <TITLE>Guess The Number</TITLE>
+    <SCRIPT LANGUAGE="JavaScript">
+      var table = new Array();
+      var player="X";
+      var counter=0;
+      for (i=0;i<3;i++)
+        table[i]=new Array();
+        
+      for (x=0;x<3;x++)
+        for (y=0;y<3;y++)
+          table[y][x]=0;
+      
+      function Tic(x, y) {
+		if(table[y][x]==0){
+        	document.getElementById("b"+x+y).value=player;
+        	table[y][x]=player;
+        	counter++;
+        	
+        	for (y=0;y<3;y++)
+        		if((table[y][0]==table[y][1])&&(table[y][0]==table[y][2]))
+        	  		if(table[y][0]!=0)
+        				endGame(table[y][0]);
+			for (x=0;x<3;x++)
+	       		if((table[0][x]==table[1][x])&&(table[0][x]==table[2][x]))
+	       			if(table[0][x]!=0)
+	       	  			endGame(table[0][x]);
+			if((table[0][0]==table[1][1])&&(table[0][0]==table[2][2]))
+				if(table[0][0]!=0)
+					endGame(table[0][0]);
+			if((table[0][2]==table[1][1])&&(table[0][2]==table[2][0]))
+				if(table[0][2]!=0)
+					endGame(table[0][2]);
+        		
+			if (counter>=9){
+				alert("No more moves. Try Again!");
+				window.location.reload(0);
+			}
+			
+			if(player=="X")
+            	player="O";
+			else
+            	player="X";
+        }
+      }
+		function endGame(player){
+			alert("Player "+player+" won, Congrats!");
+			window.location.reload(0);
+		}
+    </SCRIPT>
+  </HEAD>
+  <BODY>
+  Let's play tic tac toe. Starts player X.
+    <table>
+      <tr>
+        <td><INPUT id="b00" TYPE="button" Value="  " onClick="Tic(0,0)"></td>
+        <td><INPUT id="b10" TYPE="button" Value="  " onClick="Tic(1,0)"></td>
+        <td><INPUT id="b20" TYPE="button" Value="  " onClick="Tic(2,0)"></td>
+      </tr>
+      <tr>
+        <td><INPUT id="b01" TYPE="button" Value="  " onClick="Tic(0,1)"></td>
+        <td><INPUT id="b11" TYPE="button" Value="  " onClick="Tic(1,1)"></td>
+        <td><INPUT id="b21" TYPE="button" Value="  " onClick="Tic(2,1)"></td>
+      </tr>
+      <tr>
+        <td><INPUT id="b02" TYPE="button" Value="  " onClick="Tic(0,2)"></td>
+        <td><INPUT id="b12" TYPE="button" Value="  " onClick="Tic(1,2)"></td>
+        <td><INPUT id="b22" TYPE="button" Value="  " onClick="Tic(2,2)"></td>
+      </tr>
+    </table>
+    <div id="writeHere"></div>
+  </BODY>
+</HTML>
+
