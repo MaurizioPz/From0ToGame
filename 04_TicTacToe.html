@@ -2,22 +2,27 @@
   <HEAD>
     <TITLE>Guess The Number</TITLE>
     <SCRIPT LANGUAGE="JavaScript">
-      var table = new Array();
+      
       var player="X";
       var counter=0;
+      
+      //Inizialize my game board
+      var table = new Array();
       for (i=0;i<3;i++)
-        table[i]=new Array();
-        
+        table[i]=new Array();	//It is rappresented by a bidimensional array
       for (x=0;x<3;x++)
         for (y=0;y<3;y++)
-          table[y][x]=0;
+          table[y][x]=0;	
       
-      function Tic(x, y) {
-		if(table[y][x]==0){
+      function Tic(x, y) {		//is called at every click and will update the state
+    	  						//of the game
+    	  						
+		if(table[y][x]==0){		//valid move = player choose empty cell
         	document.getElementById("b"+x+y).value=player;
         	table[y][x]=player;
         	counter++;
         	
+        	//Check for all possible winning condition
         	for (y=0;y<3;y++)
         		if((table[y][0]==table[y][1])&&(table[y][0]==table[y][2]))
         	  		if(table[y][0]!=0)
@@ -34,11 +39,12 @@
 					endGame(table[0][2]);
         		
 			if (counter>=9){
+				//nobody won
 				alert("No more moves. Try Again!");
 				window.location.reload(0);
 			}
 			
-			if(player=="X")
+			if(player=="X")	//change player
             	player="O";
 			else
             	player="X";
