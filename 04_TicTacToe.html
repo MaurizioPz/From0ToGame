@@ -7,11 +7,11 @@
       var counter=0;
       
       //Inizialize my game board
-      var table = new Array();
-      for (i=0;i<3;i++)
-        table[i]=new Array();	//It is rappresented by a bidimensional array
-      for (x=0;x<3;x++)
-        for (y=0;y<3;y++)
+      var table = [];
+      for (var i=0;i<3;i++)
+        table[i]=[];	//It is reppresented by a bidimensional array
+      for (var x=0;x<3;x++)
+        for (var y=0;y<3;y++)
           table[y][x]=0;	
       
       function Tic(x, y) {		//is called at every click and will update the state
@@ -23,11 +23,11 @@
         	counter++;
         	
         	//Check for all possible winning condition
-        	for (y=0;y<3;y++)
+        	for (var y=0;y<3;y++)
         		if((table[y][0]==table[y][1])&&(table[y][0]==table[y][2]))
         	  		if(table[y][0]!=0)
         				endGame(table[y][0]);
-			for (x=0;x<3;x++)
+			for (var x=0;x<3;x++)
 	       		if((table[0][x]==table[1][x])&&(table[0][x]==table[2][x]))
 	       			if(table[0][x]!=0)
 	       	  			endGame(table[0][x]);
