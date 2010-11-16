@@ -158,6 +158,14 @@
 		    			jumped=true;
 		    			return true;
 		    		}
+		    		if ((table[sY-1][sX+1]==player+player)&&(x==sX+2)&&(y==sY-2)){ //jump king
+						jumped=true;
+		    			return true;
+		    			}
+		    		if ((table[sY-1][sX-1]==player+player)&&(x==sX-2)&&(y==sY-2)){
+		    			jumped=true;
+		    			return true;
+		    		}
 		    		if ((table[sY-1][sX+1]=="Y")&&(x==sX+2)&&(y==sY-2)){ //jump eating
 		    			eat(sX+1,sY-1);
 		    			jumped=true;
@@ -197,6 +205,14 @@
 		    			return true;
 		    			}
 		    		if ((table[sY+1][sX-1]==player)&&(x==sX-2)&&(y==sY+2)){
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX+1]==player+player)&&(x==sX+2)&&(y==sY+2)){ //jump king
+						jumped=true;
+		    			return true;
+		    			}
+		    		if ((table[sY+1][sX-1]==player+player)&&(x==sX-2)&&(y==sY+2)){
 		    			jumped=true;
 		    			return true;
 		    		}
