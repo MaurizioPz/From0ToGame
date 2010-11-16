@@ -1,0 +1,408 @@
+<HTML>
+  <HEAD>
+    <TITLE>Checkers</TITLE>
+    <SCRIPT LANGUAGE="JavaScript">
+    var table = [];
+    var player="X"; //players are X and Y, starts player X
+    var countX=12;
+    var countY=12;
+    
+    var noDeselect=false;
+    var jumped=false;
+    var sX=8;
+    var sY=8;
+    
+    
+    //Board Inizialization 
+    for (var i=3;i<5;i++)
+        table[i]=[];
+    
+    for (var x=0;x<8;x++)
+        for (var y=3;y<5;y++)
+          table[y][x]=0;
+    table[0]=new Array("X",0,"X",0,"X",0,"X",0);
+    table[1]=new Array(0,"X",0,"X",0,"X",0,"X");
+    table[2]=new Array("X",0,"X",0,"X",0,"X",0);
+    table[5]=new Array(0,"Y",0,"Y",0,"Y",0,"Y");
+    table[6]=new Array("Y",0,"Y",0,"Y",0,"Y",0);
+    table[7]=new Array(0,"Y",0,"Y",0,"Y",0,"Y");
+    
+    
+    function move(x, y) {
+    	if((sX==8)&&(sY==8)){ //no previous selected
+	    	if ((table[y][x]==player)||(table[y][x]==player+player)){ //Selected owned pice //player+player= XX or YY which is a king piece
+	    		sX=x;sY=y;
+	    		document.getElementById("b"+x+y).style.background='#00ff00'; 
+	    		noDeselect=false;
+	    	}
+    	}else if (((table[y][x]==player)||(table[y][x]==player+player))&&(!noDeselect)){ //Change selections
+    			document.getElementById("b"+sX+sY).style.background='#EEEEEE';
+    			sX=x;sY=y;
+    			document.getElementById("b"+x+y).style.background='#00ff00';
+   		}
+    	
+   		if(isValidMove(x,y)){ //check for valid move
+  			document.getElementById("b"+x+y).value=document.getElementById("b"+sX+sY).value;//move
+   			table[y][x]=table[sY][sX];
+   			document.getElementById("b"+sX+sY).value="  ";
+   			table[sY][sX]=0;
+   			document.getElementById("b"+sX+sY).style.background='#EEEEEE';
+   			
+   			//restore status variables
+   			sX=8;
+   			sY=8;
+   			
+   			checkForKing(x,y);
+   			
+   			if (jumped){ //Check if the player has another turn
+   				if (hasAnotherTurn(x,y)){
+   					document.getElementById("b"+x+y).style.background='#00ff00';
+   					sX=x; sY=y;
+   					noDeselect=true;  //if player has extra turn he can move only the current piece
+   				}else{
+   					changePlayer();
+   					noDeselect=false;
+   				}
+   			}else{
+   				jumped=false;
+   				noDeselect=false;
+   				changePlayer();
+   			}
+   				
+   			
+   		}
+    	  	
+    }    
+    
+    function isValidMove(x,y){ //Check if it is a valid move
+   		if (table[y][x]==0){ //player chose an empty cell
+   			try{
+		    	if ((table[sY][sX]=="X")||(table[sY][sX]=="XX")){	
+		    		if(!noDeselect){ //no deselect means extra turn, in extra turn player can only jump, no simple move
+			    		if ((x==sX+1)&&(y==sY+1)){ //simple move
+			    			jumped=false;
+		    				return true;
+			    		}
+			    		if ((x==sX-1)&&(y==sY+1)){
+			    			jumped=false;
+		    				return true;
+			    		}
+		    		}
+		    		if ((table[sY+1][sX+1]==player)&&(x==sX+2)&&(y==sY+2)){ //jump no eating
+						jumped=true;
+		    			return true;
+		    			}
+		    		if ((table[sY+1][sX-1]==player)&&(x==sX-2)&&(y==sY+2)){
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX+1]=="Y")&&(x==sX+2)&&(y==sY+2)){ //jump eating
+		    			eat(sX+1,sY+1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX-1]=="Y")&&(x==sX-2)&&(y==sY+2)){
+		    			eat(sX-1,sY+1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    	}else if ((table[sY][sX]=="Y")||(table[sY][sX]=="YY")){
+		    		if(!noDeselect){
+			    		if ((x==sX+1)&&(y==sY-1)){
+			    			jumped=false;
+			    			return true;
+			    		}
+			    		if ((x==sX-1)&&(y==sY-1)){
+			    			jumped=false;
+		    				return true;
+			    		}
+		    		}
+		    		if ((table[sY-1][sX+1]==player)&&(x==sX+2)&&(y==sY-2)){
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX-1]==player)&&(x==sX-2)&&(y==sY-2)){
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX+1]=="X")&&(x==sX+2)&&(y==sY-2)){
+		    			eat(sX+1,sY-1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX-1]=="X")&&(x==sX-2)&&(y==sY-2)){
+		    			eat(sX-1,sY-1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    	}
+   			}catch(err){} //This try catch prevent errors I go out of the bounds of the array
+   			try{
+		   		if (table[sY][sX]=="XX"){
+		    		//In this case the piece can move backwards so check those moves
+		    		if(!noDeselect){
+			    		if ((x==sX+1)&&(y==sY-1)){ //simple move
+			    			jumped=false;
+							return true;
+			    		}
+			    		if ((x==sX-1)&&(y==sY-1)){
+			    			jumped=false;
+							return true;
+			    		}
+		    		}
+		    		if ((table[sY-1][sX+1]==player)&&(x==sX+2)&&(y==sY-2)){ //jump no eating
+						jumped=true;
+		    			return true;
+		    			}
+		    		if ((table[sY-1][sX-1]==player)&&(x==sX-2)&&(y==sY-2)){
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX+1]=="Y")&&(x==sX+2)&&(y==sY-2)){ //jump eating
+		    			eat(sX+1,sY-1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX-1]=="Y")&&(x==sX-2)&&(y==sY-2)){
+		    			eat(sX-1,sY-1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX+1]=="YY")&&(x==sX+2)&&(y==sY-2)){ //jump eating king
+		    			eat(sX+1,sY-1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY-1][sX-1]=="YY")&&(x==sX-2)&&(y==sY-2)){
+		    			eat(sX-1,sY-1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		   		}
+   			}catch(err){}
+   			try{
+	    		if (table[sY][sX]=="YY"){
+	    			if(!noDeselect){
+		    			if ((x==sX+1)&&(y==sY+1)){ //simple move
+			    			jumped=false;
+							return true;
+			    		}
+			    		if ((x==sX-1)&&(y==sY+1)){
+			    			jumped=false;
+							return true;
+			    		}
+	    			}
+		    		if ((table[sY+1][sX+1]==player)&&(x==sX+2)&&(y==sY+2)){ //jump no eating
+						jumped=true;
+		    			return true;
+		    			}
+		    		if ((table[sY+1][sX-1]==player)&&(x==sX-2)&&(y==sY+2)){
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX+1]=="X")&&(x==sX+2)&&(y==sY+2)){ //jump eating
+		    			eat(sX+1,sY+1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX-1]=="X")&&(x==sX-2)&&(y==sY+2)){
+		    			eat(sX-1,sY+1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX+1]=="XX")&&(x==sX+2)&&(y==sY+2)){ //jump eating king
+		    			eat(sX+1,sY+1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    		if ((table[sY+1][sX-1]=="XX")&&(x==sX-2)&&(y==sY+2)){
+		    			eat(sX-1,sY+1);
+		    			jumped=true;
+		    			return true;
+		    		}
+		    	}
+   			}catch(err){}
+	    		
+    	}
+    	return false;
+    }
+    
+    function checkForKing(x,y){ //check if the pice should become king
+    	//who is playing?
+		if(player=="X"){
+			//is it at the end of the boad?
+			if(y==7){
+				//is king!
+				table[y][x]=player+player;
+				document.getElementById("b"+x+y).value=player+player;
+			}
+		}else{
+			if(y==0){
+				//is king!
+				table[y][x]=player+player;
+				document.getElementById("b"+x+y).value=player+player;
+			}
+		}
+    }
+    
+    function hasAnotherTurn(x,y){ //When the player jumps it is possible to have another turn, check if conditions are valid
+    	try{
+		   	if ((table[y][x]=="X")||(table[y][x]=="XX")){
+		   		if ((table[y+1][x+1]!=0)&&(table[y+2][x+2]==0))
+		   			return true;
+		   		if ((table[y+1][x-1]!=0)&&(table[y+2][x-2]==0))
+		   			return true;
+		   	}else if ((table[y][x]=="Y")||(table[y][x]=="YY")){
+		   		if ((table[y-1][x+1]!=0)&&(table[y-2][x+2]==0))
+		   			return true;
+		   		if ((table[y-1][x-1]!=0)&&(table[y-2][x-2]==0))
+		   			return true;
+		   	}
+    	}catch(err){}
+    	try{
+		   	if (table[y][x]=="XX"){
+		   		if ((table[y-1][x+1]!=0)&&(table[y-2][x+2]==0))
+		   			return true;
+		   		if ((table[y-1][x-1]!=0)&&(table[y-2][x-2]==0))
+		   			return true;
+		   	}else if (table[y][x]=="YY"){
+		   		if ((table[y+1][x+1]!=0)&&(table[y+2][x+2]==0))
+		   			return true;
+		   		if ((table[y+1][x-1]!=0)&&(table[y+2][x-2]==0))
+		   			return true;
+		   	}
+    	}catch(err){}
+    	
+    	return false;
+    
+    }
+    
+    function eat(x,y){ //delete piece and decrease count
+    	document.getElementById("b"+x+y).value="  ";
+    	
+		if((table[y][x]=="X")||(table[y][x]=="XX"))
+			countX--;
+		else
+			countY--;
+		table[y][x]=0;
+		document.getElementById("writeHere").innerHTML="player X = "+countX+" player Y = "+countY;
+		if (countX==0)
+			endGame("Y");
+		if (countY==0)
+			endGame("X");
+    }
+    
+    function changePlayer(){
+    	if (player=="X")
+    		player="Y";
+    	else
+    		player="X";
+    }
+    
+    function endGame(player){
+    	  alert("Player "+player+" won, Congrats!");
+    	  window.location.reload(0);
+    }
+    
+    function skipTurn(){ //let player skip an extra turn. Without this the game could enter a loophole
+    	if (noDeselect){
+    		noDeselect=false;
+    		document.getElementById("b"+sX+sY).style.background='#EEEEEE';
+    		sX=8;sY=8;
+    		changePlayer();
+    	}else{
+    		alert("Sorry, you can skip turn only after jump")
+    	}
+    }
+    
+    </SCRIPT>
+  </HEAD>
+  <BODY>
+  Let's play Checkers. Starts player X.<br>
+  <INPUT id="skip" TYPE="button" Value="Skip Turn" onClick="skipTurn()">
+    <table>
+      <tr>
+        <td><INPUT id="b00" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(0,0)"></td>
+        <td><INPUT id="b10" TYPE="button" style="background-color:555555" Value="  " onClick="move(1,0)"></td>
+        <td><INPUT id="b20" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(2,0)"></td>
+        <td><INPUT id="b30" TYPE="button" style="background-color:555555" Value="  " onClick="move(3,0)"></td>
+        <td><INPUT id="b40" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(4,0)"></td>
+        <td><INPUT id="b50" TYPE="button" style="background-color:555555" Value="  " onClick="move(5,0)"></td>
+        <td><INPUT id="b60" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(6,0)"></td>
+        <td><INPUT id="b70" TYPE="button" style="background-color:555555" Value="  " onClick="move(7,0)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b01" TYPE="button" style="background-color:555555" Value="  " onClick="move(0,1)"></td>
+        <td><INPUT id="b11" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(1,1)"></td>
+        <td><INPUT id="b21" TYPE="button" style="background-color:555555" Value="  " onClick="move(2,1)"></td>
+        <td><INPUT id="b31" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(3,1)"></td>
+        <td><INPUT id="b41" TYPE="button" style="background-color:555555" Value="  " onClick="move(4,1)"></td>
+        <td><INPUT id="b51" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(5,1)"></td>
+        <td><INPUT id="b61" TYPE="button" style="background-color:555555" Value="  " onClick="move(6,1)"></td>
+        <td><INPUT id="b71" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(7,1)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b02" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(0,2)"></td>
+        <td><INPUT id="b12" TYPE="button" style="background-color:555555" Value="  " onClick="move(1,2)"></td>
+        <td><INPUT id="b22" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(2,2)"></td>
+        <td><INPUT id="b32" TYPE="button" style="background-color:555555" Value="  " onClick="move(3,2)"></td>
+        <td><INPUT id="b42" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(4,2)"></td>
+        <td><INPUT id="b52" TYPE="button" style="background-color:555555" Value="  " onClick="move(5,2)"></td>
+        <td><INPUT id="b62" TYPE="button" style="background-color:EEEEEE" Value="X" onClick="move(6,2)"></td>
+        <td><INPUT id="b72" TYPE="button" style="background-color:555555" Value="  " onClick="move(7,2)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b03" TYPE="button" style="background-color:555555" Value="  " onClick="move(0,3)"></td>
+        <td><INPUT id="b13" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(1,3)"></td>
+        <td><INPUT id="b23" TYPE="button" style="background-color:555555" Value="  " onClick="move(2,3)"></td>
+        <td><INPUT id="b33" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(3,3)"></td>
+        <td><INPUT id="b43" TYPE="button" style="background-color:555555" Value="  " onClick="move(4,3)"></td>
+        <td><INPUT id="b53" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(5,3)"></td>
+        <td><INPUT id="b63" TYPE="button" style="background-color:555555" Value="  " onClick="move(6,3)"></td>
+        <td><INPUT id="b73" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(7,3)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b04" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(0,4)"></td>
+        <td><INPUT id="b14" TYPE="button" style="background-color:555555" Value="  " onClick="move(1,4)"></td>
+        <td><INPUT id="b24" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(2,4)"></td>
+        <td><INPUT id="b34" TYPE="button" style="background-color:555555" Value="  " onClick="move(3,4)"></td>
+        <td><INPUT id="b44" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(4,4)"></td>
+        <td><INPUT id="b54" TYPE="button" style="background-color:555555" Value="  " onClick="move(5,4)"></td>
+        <td><INPUT id="b64" TYPE="button" style="background-color:EEEEEE" Value="  " onClick="move(6,4)"></td>
+        <td><INPUT id="b74" TYPE="button" style="background-color:555555" Value="  " onClick="move(7,4)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b05" TYPE="button" style="background-color:555555" Value="  " onClick="move(0,5)"></td>
+        <td><INPUT id="b15" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(1,5)"></td>
+        <td><INPUT id="b25" TYPE="button" style="background-color:555555" Value="  " onClick="move(2,5)"></td>
+        <td><INPUT id="b35" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(3,5)"></td>
+        <td><INPUT id="b45" TYPE="button" style="background-color:555555" Value="  " onClick="move(4,5)"></td>
+        <td><INPUT id="b55" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(5,5)"></td>
+        <td><INPUT id="b65" TYPE="button" style="background-color:555555" Value="  " onClick="move(6,5)"></td>
+        <td><INPUT id="b75" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(7,5)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b06" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(0,6)"></td>
+        <td><INPUT id="b16" TYPE="button" style="background-color:555555" Value="  " onClick="move(1,6)"></td>
+        <td><INPUT id="b26" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(2,6)"></td>
+        <td><INPUT id="b36" TYPE="button" style="background-color:555555" Value="  " onClick="move(3,6)"></td>
+        <td><INPUT id="b46" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(4,6)"></td>
+        <td><INPUT id="b56" TYPE="button" style="background-color:555555" Value="  " onClick="move(5,6)"></td>
+        <td><INPUT id="b66" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(6,6)"></td>
+        <td><INPUT id="b76" TYPE="button" style="background-color:555555" Value="  " onClick="move(7,6)"></td>
+      </tr>
+       <tr>
+        <td><INPUT id="b07" TYPE="button" style="background-color:555555" Value="  " onClick="move(0,7)"></td>
+        <td><INPUT id="b17" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(1,7)"></td>
+        <td><INPUT id="b27" TYPE="button" style="background-color:555555" Value="  " onClick="move(2,7)"></td>
+        <td><INPUT id="b37" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(3,7)"></td>
+        <td><INPUT id="b47" TYPE="button" style="background-color:555555" Value="  " onClick="move(4,7)"></td>
+        <td><INPUT id="b57" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(5,7)"></td>
+        <td><INPUT id="b67" TYPE="button" style="background-color:555555" Value="  " onClick="move(6,7)"></td>
+        <td><INPUT id="b77" TYPE="button" style="background-color:EEEEEE" Value="Y" onClick="move(7,7)"></td>
+      </tr>     
+    </table>
+    <div id="writeHere"></div>
+  </BODY>
+</HTML>
+
