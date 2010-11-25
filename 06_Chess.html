@@ -1,0 +1,956 @@
+<HTML>
+	<HEAD>
+		<TITLE>
+			Chess
+		</TITLE>
+		<SCRIPT LANGUAGE="JavaScript">
+			var table = [];
+			var player = "White"; //players are Black and White, starts player White
+			var selected = null;
+			var makeMeQueen = false;
+
+			function emptyCell(posX, posY) {
+				var posX = posX;
+				var posY = posY;
+				this.color = "empty";
+				
+				this.select = function() {
+					selected = null;
+				}
+				this.toString = function() { //Returns a string representation of the object 
+					return "     ";
+				};
+
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+			//This is a Peon object
+
+			function Peon(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				if (color == "White") 
+					this.direction = -1; //Defines in which direction the piece will move
+				else //direction will be used as a multiplier (see isValidMove)
+					this.direction = 1;
+
+				this.move = function(x, y) {
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+
+					if ((color == "White") && (posY == 0)) 
+						makeMeQueen = true;
+					else if ((color == "Black") && (posY == 7)) 
+						makeMeQueen = true;
+				};
+				
+				this.isValidMove = function(x, y) {
+					//Checks if it is an eating move or not
+					if (table[y][x] instanceof emptyCell) {
+						//no can move 1 square forward 
+						if ((posX == x) && (posY + (1 * this.direction) == y)) {
+							return true;
+						}
+						// or 2 squares if is the first move		
+						if (posY == 3.5 - (2.5 * this.direction)) { //is a complicated way to check the peon is in it's
+							//starting position: if direction==-1 then peon is 
+							//white and should be in posY=6 (3.5+2.5) else peon
+							//is black and should be in posX=1 (3.5-2.5)
+							if ((posX == x) && (posY + (2 * this.direction) == y)) 
+								return true;
+						}
+					} else {
+						//yes Checks that it will eat opponent piece and not owned piece
+						if (table[y][x].color != this.color) {
+							//yes can eat only diagonally
+							if ((posX + 1 == x) && (posY + (1 * this.direction) == y)) 
+								return true;
+							if ((posX - 1 == x) && (posY + (1 * this.direction) == y)) 
+								return true;
+						}
+					}
+
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wP";
+					else 
+						return "bP";
+				};
+				
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+
+			//This is a Rook 
+
+			function Rook(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				
+				this.move = function(x, y) { 
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+
+
+				};
+
+				this.isValidMove = function(x, y) {
+					// can move horizontally or vertically but only if there's no other piece in between 
+					//so check that the way is free.
+					if (posX == x) {
+						if (posY < y) {
+							for (var i = posY + 1; i < y; i++) {
+								if (!(table[i][x]instanceof emptyCell)) //if no emptyCell
+									return false;
+							}
+						} else {
+							for (var i = y + 1; i < posY; i++) {
+								if (!(table[i][x]instanceof emptyCell)) 
+									return false;
+							}
+						}
+						return true;
+					}
+					if (posY == y) {
+						if (posX < x) {
+							for (var i = posX + 1; i < x; i++) {
+								if (!(table[y][i]instanceof emptyCell)) //if no emptyCell
+									return false;
+							}
+						} else {
+							for (var i = x + 1; i < posX; i++) {
+								if (!(table[y][i]instanceof emptyCell)) 
+									return false;
+							}
+						}
+						return true;
+					}
+
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wR";
+					else 
+						return "bR";
+				};
+
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+
+
+			//This is a Knight
+
+			function Knight(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				
+				this.move = function(x, y) { 
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+				};
+
+				this.isValidMove = function(x, y) {
+					// can move only in L moves
+					if ((posX + 1 == x) && (posY + 2 == y)) {
+						return true;
+					}
+					if ((posX + 1 == x) && (posY - 2 == y)) {
+						return true;
+					}
+					if ((posX - 1 == x) && (posY + 2 == y)) {
+						return true;
+					}
+					if ((posX - 1 == x) && (posY - 2 == y)) {
+						return true;
+					}
+					if ((posY + 1 == y) && (posX + 2 == x)) {
+						return true;
+					}
+					if ((posY + 1 == y) && (posX - 2 == x)) {
+						return true;
+					}
+					if ((posY - 1 == y) && (posX + 2 == x)) {
+						return true;
+					}
+					if ((posY - 1 == y) && (posX - 2 == x)) {
+						return true;
+					}
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wN";
+					else 
+						return "bN";
+				};
+
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+
+			//This is a Bishop 
+
+			function Bishop(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				
+				this.move = function(x, y) { 
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+				};
+
+				this.isValidMove = function(x, y) {
+					// can move only diagonally but only if there's no other piece in between 
+					//so check that the way is free.
+					if ((posX - x) * (posX - x) == (posY - y) * (posY - y)) {
+						var i = 1;
+						while ((posX + i < x) && (posY + i < y)) {
+							if (!(table[posY + i][posX + i] instanceof emptyCell)) 
+								return false;
+							i++;
+						}
+						var i = 1;
+						while ((posX + i < x) && (posY - i > y)) {
+							if (!(table[posY - i][posX + i] instanceof emptyCell)) 
+								return false;
+							i++;
+						}
+						var i = 1;
+						while ((posX - i > x) && (posY + i < y)) {
+							if (!(table[posY + i][posX - i] instanceof emptyCell))  
+								return false;
+							i++;
+						}
+						var i = 1;
+						while ((posX - i > x) && (posY - i > y)) {
+							if (!(table[posY - i][posX - i] instanceof emptyCell)) 
+								return false;
+							i++;
+						}
+						return true;
+					}
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wB";
+					else 
+						return "bB";
+				};
+				
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+
+			//This is a Knight
+
+			function Knight(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				
+				this.move = function(x, y) { 
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+
+
+				};
+
+				this.isValidMove = function(x, y) {
+					// can move only in L moves
+					if ((posX + 1 == x) && (posY + 2 == y)) {
+						return true;
+					}
+					if ((posX + 1 == x) && (posY - 2 == y)) {
+						return true;
+					}
+					if ((posX - 1 == x) && (posY + 2 == y)) {
+						return true;
+					}
+					if ((posX - 1 == x) && (posY - 2 == y)) {
+						return true;
+					}
+					if ((posY + 1 == y) && (posX + 2 == x)) {
+						return true;
+					}
+					if ((posY + 1 == y) && (posX - 2 == x)) {
+						return true;
+					}
+					if ((posY - 1 == y) && (posX + 2 == x)) {
+						return true;
+					}
+					if ((posY - 1 == y) && (posX - 2 == x)) {
+						return true;
+					}
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wN";
+					else 
+						return "bN";
+				};
+				
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+
+			//This is a Queen 
+
+			function Queen(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				
+				this.move = function(x, y) { 
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+
+
+				};
+
+				this.isValidMove = function(x, y) {
+					// can move diagonally, horrizontally or vertically, like Rook+Bishop
+					//check diagonally
+					if ((posX - x) * (posX - x) == (posY - y) * (posY - y)) {
+						var i = 1;
+						while ((posX + i < x) && (posY + i < y)) {
+							if (!(table[posY + i][posX + i] instanceof emptyCell)) 
+								return false;
+							i++;
+						}
+						var i = 1;
+						while ((posX + i < x) && (posY - i > y)) {
+							if (!(table[posY - i][posX + i] instanceof emptyCell)) 
+								return false;
+							i++;
+						}
+						var i = 1;
+						while ((posX - i > x) && (posY + i < y)) {
+							if (!(table[posY + i][posX - i] instanceof emptyCell))  
+								return false;
+							i++;
+						}
+						var i = 1;
+						while ((posX - i > x) && (posY - i > y)) {
+							if (!(table[posY - i][posX - i] instanceof emptyCell)) 
+								return false;
+							i++;
+						}
+						return true;
+					}
+					//Check Vertically
+					if (posX == x) {
+						if (posY < y) {
+							for (var i = posY + 1; i < y; i++) {
+								if (!(table[i][x]instanceof emptyCell)) //if no emptyCell
+									return false;
+							}
+						} else {
+							for (var i = y + 1; i < posY; i++) {
+								if (!(table[i][x]instanceof emptyCell)) 
+									return false;
+							}
+						}
+						return true;
+					}
+					//Check Horizzontally
+					if (posY == y) {
+						if (posX < x) {
+							for (var i = posX + 1; i < x; i++) {
+								if (!(table[y][i]instanceof emptyCell)) //if no emptyCell
+									return false;
+							}
+						} else {
+							for (var i = x + 1; i < posX; i++) {
+								if (!(table[y][i]instanceof emptyCell)) 
+									return false;
+							}
+						}
+						return true;
+					}
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wQ";
+					else 
+						return "bQ";
+				};
+				
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+			//This is a King 
+
+			function King(color, posX, posY) {
+				this.color = color;
+				var posX = posX;
+				var posY = posY;
+				
+				this.move = function(x, y) { 
+					table[posY][posX] = table[y][x];
+					table[y][x] = this;
+
+					posX = x;
+					posY = y;
+				};
+
+				this.isValidMove = function(x, y) {
+					// can move in every direction if it is close
+					if (((posX - x) * (posX - x) <= 1) && ((posY - y) * (posY - y) <= 1)) {
+						return true;
+					}
+					return false;
+				};
+
+				this.select = function() {
+					selected = this;
+
+				}
+				
+				this.toString = function() { //Returns a string representation of the object 
+					if (color == "White") 
+						return "wK";
+					else 
+						return "bK";
+				};
+
+				this.getPosX = function() {
+					return posX;
+				};
+
+				this.getPosY = function() {
+					return posY;
+				};
+			}
+
+			//Board Inizialization 
+			for (var i = 0; i < 8; i++)
+				table[i] = [];
+
+			//table[0]=new Array("bR","bN","bB","bQ","bK","bB","bN","bR");
+			for (var x = 0; x < 8; x++) {
+				table[1][x] = new Peon("Black", x, 1, table);
+				table[2][x] = new emptyCell(x, 2);
+				table[3][x] = new emptyCell(x, 3);
+				table[4][x] = new emptyCell(x, 4);
+				table[5][x] = new emptyCell(x, 5);
+				table[6][x] = new Peon("White", x, 6, table);
+			}
+			//table[7]=new Array("wR","wN","wB","wQ","wK","wB","wN","wR");
+			table[0][0] = new Rook("Black", 0, 0, table);
+			table[0][7] = new Rook("Black", 7, 0, table);
+			table[7][0] = new Rook("White", 0, 7, table);
+			table[7][7] = new Rook("White", 7, 7, table);
+
+			table[0][1] = new Knight("Black", 1, 0, table);
+			table[0][6] = new Knight("Black", 6, 0, table);
+			table[7][1] = new Knight("White", 1, 7, table);
+			table[7][6] = new Knight("White", 6, 7, table);
+
+			table[0][2] = new Bishop("Black", 2, 0, table);
+			table[0][5] = new Bishop("Black", 5, 0, table);
+			table[7][2] = new Bishop("White", 2, 7, table);
+			table[7][5] = new Bishop("White", 5, 7, table);
+
+			table[0][3] = new Queen("Black", 3, 0, table);
+			table[7][3] = new Queen("White", 3, 7, table);
+
+			table[0][4] = new King("Black", 4, 0, table);
+			table[7][4] = new King("White", 4, 7, table);
+
+			var whiteKing = table[7][4];
+			var blackKing = table[0][4];
+
+			function move(x, y) {
+				//Check if there is a piece already selected
+				if (selected == null) {
+					//no Check if selection is valid
+					if (!(table[y][x] instanceof emptyCell)) {
+						if (table[y][x].color == player) {
+							//yes Select
+							table[y][x].select();
+						}
+					} //no Do nothing
+					//Click on owned piece?
+				} else if (!(table[y][x] instanceof emptyCell)) {
+					if (table[y][x].color == player) {
+						//yes Change selection if valid
+						table[y][x].select();
+
+					} else if (selected.isValidMove(x, y)) { //no check if eating move is valid
+						//yes is eating move
+						//pretend to move and check that the king is not in check
+						//first store status
+						var temp = table[y][x];
+						var tempX = selected.getPosX();
+						var tempY = selected.getPosY();
+						eat(x, y);
+						selected.move(x, y);
+						if (isKingInDanger()) {
+							selected.move(tempX, tempY);
+							table[y][x] = temp; //resurrect
+						} else {
+							if (makeMeQueen) { //last piece moved was a peon and reached the end of the board
+								table[y][x] = new Queen(selected.color, x, y, table); //replace peon with queen
+								makeMeQueen = false;
+							}
+							selected = null;
+							changePlayer();
+						}
+					}
+				} else if (selected.isValidMove(x, y)) { //no Is move valid?
+					var tempX = selected.getPosX();
+					var tempY = selected.getPosY();
+					selected.move(x, y);
+					if (isKingInDanger()) {
+						selected.move(tempX, tempY);
+					} else {
+						if (makeMeQueen) { //last piece moved was a peon and reached the end of the board
+							table[y][x] = new Queen(selected.color, x, y, table); //replace peon with queen
+							makeMeQueen = false;
+						}
+						selected = null;
+						changePlayer();
+					}
+				}
+				//no Do nothing
+				//Draw
+				draw();
+			}
+
+			function isKingInDanger() {
+				//Check for every square if there's an opponent piece
+				//can it reach the king?
+				if (player == "White") {
+					for (var y = 0; y < 8; y++)
+						for (var x = 0; x < 8; x++)
+							if (table[y][x].color == "Black") 
+								if (table[y][x].isValidMove(whiteKing.getPosX(), whiteKing.getPosY())) {
+									alert("Can't move,Your king would be in check");
+									return true;
+								}
+				} else {
+					for (var y = 0; y < 8; y++)
+						for (var x = 0; x < 8; x++)
+							if (table[y][x].color == "White") 
+								if (table[y][x].isValidMove(blackKing.getPosX(), blackKing.getPosY())) {
+									alert("Can't move,Your king would be in check");
+									return true;
+								}
+				}
+				return false;
+			}
+
+			function draw() {
+				for (var y = 0; y < 8; y++)
+					for (var x = 0; x < 8; x++) {
+						document.getElementById("b" + x + y).value = table[y][x].toString();
+					}
+
+			}
+
+
+			function eat(x, y) {
+				if (table[y][x].toString() == "wK") //Should never actually happen
+					endGame("Black");
+				if (table[y][x].toString() == "bK") endGame("White");
+					table[y][x] = new emptyCell(x, y);
+			}
+
+			function changePlayer() {
+				if (player == "Black") player = "White";
+					else player = "Black";
+			}
+
+			function endGame(player) {
+				alert("Player " + player + " won, Congrats!");
+				window.location.reload(0);
+			}
+		</SCRIPT>
+	</HEAD>
+	<BODY>
+		Let's play Chess. Starts player White.
+		<br>
+		<table>
+			<tr>
+				<td>
+					<INPUT id="b00" TYPE="button" style="background-color:EEEEEE" Value="bR"
+					onClick="move(0,0)">
+				</td>
+				<td>
+					<INPUT id="b10" TYPE="button" style="background-color:888888" Value="bN"
+					onClick="move(1,0)">
+				</td>
+				<td>
+					<INPUT id="b20" TYPE="button" style="background-color:EEEEEE" Value="bB"
+					onClick="move(2,0)">
+				</td>
+				<td>
+					<INPUT id="b30" TYPE="button" style="background-color:888888" Value="bQ"
+					onClick="move(3,0)">
+				</td>
+				<td>
+					<INPUT id="b40" TYPE="button" style="background-color:EEEEEE" Value="bK"
+					onClick="move(4,0)">
+				</td>
+				<td>
+					<INPUT id="b50" TYPE="button" style="background-color:888888" Value="bB"
+					onClick="move(5,0)">
+				</td>
+				<td>
+					<INPUT id="b60" TYPE="button" style="background-color:EEEEEE" Value="bN"
+					onClick="move(6,0)">
+				</td>
+				<td>
+					<INPUT id="b70" TYPE="button" style="background-color:888888" Value="bR"
+					onClick="move(7,0)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b01" TYPE="button" style="background-color:888888" Value="bP"
+					onClick="move(0,1)">
+				</td>
+				<td>
+					<INPUT id="b11" TYPE="button" style="background-color:EEEEEE" Value="bP"
+					onClick="move(1,1)">
+				</td>
+				<td>
+					<INPUT id="b21" TYPE="button" style="background-color:888888" Value="bP"
+					onClick="move(2,1)">
+				</td>
+				<td>
+					<INPUT id="b31" TYPE="button" style="background-color:EEEEEE" Value="bP"
+					onClick="move(3,1)">
+				</td>
+				<td>
+					<INPUT id="b41" TYPE="button" style="background-color:888888" Value="bP"
+					onClick="move(4,1)">
+				</td>
+				<td>
+					<INPUT id="b51" TYPE="button" style="background-color:EEEEEE" Value="bP"
+					onClick="move(5,1)">
+				</td>
+				<td>
+					<INPUT id="b61" TYPE="button" style="background-color:888888" Value="bP"
+					onClick="move(6,1)">
+				</td>
+				<td>
+					<INPUT id="b71" TYPE="button" style="background-color:EEEEEE" Value="bP"
+					onClick="move(7,1)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b02" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(0,2)">
+				</td>
+				<td>
+					<INPUT id="b12" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(1,2)">
+				</td>
+				<td>
+					<INPUT id="b22" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(2,2)">
+				</td>
+				<td>
+					<INPUT id="b32" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(3,2)">
+				</td>
+				<td>
+					<INPUT id="b42" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(4,2)">
+				</td>
+				<td>
+					<INPUT id="b52" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(5,2)">
+				</td>
+				<td>
+					<INPUT id="b62" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(6,2)">
+				</td>
+				<td>
+					<INPUT id="b72" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(7,2)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b03" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(0,3)">
+				</td>
+				<td>
+					<INPUT id="b13" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(1,3)">
+				</td>
+				<td>
+					<INPUT id="b23" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(2,3)">
+				</td>
+				<td>
+					<INPUT id="b33" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(3,3)">
+				</td>
+				<td>
+					<INPUT id="b43" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(4,3)">
+				</td>
+				<td>
+					<INPUT id="b53" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(5,3)">
+				</td>
+				<td>
+					<INPUT id="b63" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(6,3)">
+				</td>
+				<td>
+					<INPUT id="b73" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(7,3)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b04" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(0,4)">
+				</td>
+				<td>
+					<INPUT id="b14" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(1,4)">
+				</td>
+				<td>
+					<INPUT id="b24" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(2,4)">
+				</td>
+				<td>
+					<INPUT id="b34" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(3,4)">
+				</td>
+				<td>
+					<INPUT id="b44" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(4,4)">
+				</td>
+				<td>
+					<INPUT id="b54" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(5,4)">
+				</td>
+				<td>
+					<INPUT id="b64" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(6,4)">
+				</td>
+				<td>
+					<INPUT id="b74" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(7,4)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b05" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(0,5)">
+				</td>
+				<td>
+					<INPUT id="b15" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(1,5)">
+				</td>
+				<td>
+					<INPUT id="b25" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(2,5)">
+				</td>
+				<td>
+					<INPUT id="b35" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(3,5)">
+				</td>
+				<td>
+					<INPUT id="b45" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(4,5)">
+				</td>
+				<td>
+					<INPUT id="b55" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(5,5)">
+				</td>
+				<td>
+					<INPUT id="b65" TYPE="button" style="background-color:888888" Value="     "
+					onClick="move(6,5)">
+				</td>
+				<td>
+					<INPUT id="b75" TYPE="button" style="background-color:EEEEEE" Value="     "
+					onClick="move(7,5)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b06" TYPE="button" style="background-color:EEEEEE" Value="wP"
+					onClick="move(0,6)">
+				</td>
+				<td>
+					<INPUT id="b16" TYPE="button" style="background-color:888888" Value="wP"
+					onClick="move(1,6)">
+				</td>
+				<td>
+					<INPUT id="b26" TYPE="button" style="background-color:EEEEEE" Value="wP"
+					onClick="move(2,6)">
+				</td>
+				<td>
+					<INPUT id="b36" TYPE="button" style="background-color:888888" Value="wP"
+					onClick="move(3,6)">
+				</td>
+				<td>
+					<INPUT id="b46" TYPE="button" style="background-color:EEEEEE" Value="wP"
+					onClick="move(4,6)">
+				</td>
+				<td>
+					<INPUT id="b56" TYPE="button" style="background-color:888888" Value="wP"
+					onClick="move(5,6)">
+				</td>
+				<td>
+					<INPUT id="b66" TYPE="button" style="background-color:EEEEEE" Value="wP"
+					onClick="move(6,6)">
+				</td>
+				<td>
+					<INPUT id="b76" TYPE="button" style="background-color:888888" Value="wP"
+					onClick="move(7,6)">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<INPUT id="b07" TYPE="button" style="background-color:888888" Value="wR"
+					onClick="move(0,7)">
+				</td>
+				<td>
+					<INPUT id="b17" TYPE="button" style="background-color:EEEEEE" Value="wN"
+					onClick="move(1,7)">
+				</td>
+				<td>
+					<INPUT id="b27" TYPE="button" style="background-color:888888" Value="wB"
+					onClick="move(2,7)">
+				</td>
+				<td>
+					<INPUT id="b37" TYPE="button" style="background-color:EEEEEE" Value="wQ"
+					onClick="move(3,7)">
+				</td>
+				<td>
+					<INPUT id="b47" TYPE="button" style="background-color:888888" Value="wK"
+					onClick="move(4,7)">
+				</td>
+				<td>
+					<INPUT id="b57" TYPE="button" style="background-color:EEEEEE" Value="wB"
+					onClick="move(5,7)">
+				</td>
+				<td>
+					<INPUT id="b67" TYPE="button" style="background-color:888888" Value="wN"
+					onClick="move(6,7)">
+				</td>
+				<td>
+					<INPUT id="b77" TYPE="button" style="background-color:EEEEEE" Value="wR"
+					onClick="move(7,7)">
+				</td>
+			</tr>
+		</table>
+		<div id="writeHere">
+		</div>
+	</BODY>
+
+</HTML>
