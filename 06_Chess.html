@@ -533,34 +533,34 @@
 
 			//table[0]=new Array("bR","bN","bB","bQ","bK","bB","bN","bR");
 			for (var x = 0; x < 8; x++) {
-				table[1][x] = new Peon("Black", x, 1, table);
+				table[1][x] = new Peon("Black", x, 1);
 				table[2][x] = new emptyCell(x, 2);
 				table[3][x] = new emptyCell(x, 3);
 				table[4][x] = new emptyCell(x, 4);
 				table[5][x] = new emptyCell(x, 5);
-				table[6][x] = new Peon("White", x, 6, table);
+				table[6][x] = new Peon("White", x, 6);
 			}
 			//table[7]=new Array("wR","wN","wB","wQ","wK","wB","wN","wR");
-			table[0][0] = new Rook("Black", 0, 0, table);
-			table[0][7] = new Rook("Black", 7, 0, table);
-			table[7][0] = new Rook("White", 0, 7, table);
-			table[7][7] = new Rook("White", 7, 7, table);
+			table[0][0] = new Rook("Black", 0, 0);
+			table[0][7] = new Rook("Black", 7, 0);
+			table[7][0] = new Rook("White", 0, 7);
+			table[7][7] = new Rook("White", 7, 7);
 
-			table[0][1] = new Knight("Black", 1, 0, table);
-			table[0][6] = new Knight("Black", 6, 0, table);
-			table[7][1] = new Knight("White", 1, 7, table);
-			table[7][6] = new Knight("White", 6, 7, table);
+			table[0][1] = new Knight("Black", 1, 0);
+			table[0][6] = new Knight("Black", 6, 0);
+			table[7][1] = new Knight("White", 1, 7);
+			table[7][6] = new Knight("White", 6, 7);
 
-			table[0][2] = new Bishop("Black", 2, 0, table);
-			table[0][5] = new Bishop("Black", 5, 0, table);
-			table[7][2] = new Bishop("White", 2, 7, table);
-			table[7][5] = new Bishop("White", 5, 7, table);
+			table[0][2] = new Bishop("Black", 2, 0);
+			table[0][5] = new Bishop("Black", 5, 0);
+			table[7][2] = new Bishop("White", 2, 7);
+			table[7][5] = new Bishop("White", 5, 7);
 
-			table[0][3] = new Queen("Black", 3, 0, table);
-			table[7][3] = new Queen("White", 3, 7, table);
+			table[0][3] = new Queen("Black", 3, 0);
+			table[7][3] = new Queen("White", 3, 7);
 
-			table[0][4] = new King("Black", 4, 0, table);
-			table[7][4] = new King("White", 4, 7, table);
+			table[0][4] = new King("Black", 4, 0);
+			table[7][4] = new King("White", 4, 7);
 
 			var whiteKing = table[7][4];
 			var blackKing = table[0][4];
@@ -595,7 +595,7 @@
 							table[y][x] = temp; //resurrect
 						} else {
 							if (makeMeQueen) { //last piece moved was a peon and reached the end of the board
-								table[y][x] = new Queen(selected.color, x, y, table); //replace peon with queen
+								table[y][x] = new Queen(selected.color, x, y); //replace peon with queen
 								makeMeQueen = false;
 							}
 							selected = null;
@@ -610,7 +610,7 @@
 						selected.move(tempX, tempY);
 					} else {
 						if (makeMeQueen) { //last piece moved was a peon and reached the end of the board
-							table[y][x] = new Queen(selected.color, x, y, table); //replace peon with queen
+							table[y][x] = new Queen(selected.color, x, y); //replace peon with queen
 							makeMeQueen = false;
 						}
 						selected = null;
