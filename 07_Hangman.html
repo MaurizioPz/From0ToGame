@@ -1,0 +1,82 @@
+<HTML>
+  <HEAD>
+    <TITLE>
+      Hangman
+    </TITLE>
+    <SCRIPT LANGUAGE="JavaScript">
+      //This array will be used to display the progress of the game &nbsp; means "space" in HTML
+      var structure = [];
+      structure[0] = "                <br>" + "                <br>" + "                <br>" + "                <br>" + "                <br>" + "________________<br>";
+      structure[1] = "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|______________<br>";
+      structure[2] = "&nbsp;|----------    <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|______________<br>";
+      structure[3] = "&nbsp;|----------    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0     <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|              <br>" + "&nbsp;|______________<br>";
+      structure[4] = "&nbsp;|----------    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|              <br>" + "&nbsp;|______________<br>";
+      structure[5] = "&nbsp;|----------    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\     <br>" + "&nbsp;|______________<br>";
+      structure[6] = "&nbsp;|----------    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\\     <br>" + "&nbsp;|______________<br>";
+      structure[7] = "&nbsp;|----------    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|\\    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\\     <br>" + "&nbsp;|______________<br>";
+      structure[8] = "&nbsp;|----------    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/|\\    <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|     <br>" + "&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\\     <br>" + "&nbsp;|______________<br>";
+      var i = 0;
+      //This is the dictionary from which we will get the words
+      var words = ["ROMEO", "JULIET", "TRAGEDY", "WRITTEN", "EARLY", "CAREER", "PLAYWRIGHT", "WILLIAM", "SHAKESPEARE", "ABOUT", "YOUNG", "LOVERS", "WHOSE", "DEATHS", "ULTIMATELY", "UNITE", "THEIR", "FEUDING", "FAMILIES", "AMONG", "MOST", "POPULAR", "ARCHETYPAL", "STORIES", "YOUNG,", "TEENAGE", "LOVERS", "BELONGS", "TRADITION", "TRAGIC", "ROMANCES", "STRETCHING", "BACK", "ANTIQUITY", "PLOT", "BASED", "ITALIAN", "TRANSLATED", "VERSE", "TRAGICAL", "HISTORY", "RETOLD", "PROSE", "PALACE", "PLEASURE", "BORROWED", "HEAVILY", "EXPAND", "DEVELOPED", "SUPPORTING", "CHARACTERS", "PARTICULARLY", "PARIS", "BELIEVED", "WRITTEN", "BETWEEN", "PLAY", "FIRST", "PUBLISHED", "QUARTO", "VERSION", "THIS", "POOR", "QUALITY,", "LATER", "EDITIONS", "CORRECTED", "BRINGING", "MORE", "LINE", "WITH", "ORIGINAL", "DRAMATIC", "STRUCTURE", "ESPECIALLY", "EFFECTS", "SUCH", "SWITCHING", "BETWEEN", "COMEDY", "TRAGEDY", "HEIGHTEN", "TENSION,", "EXPANSION", "MINOR", "CHARACTERS", "EMBELLISH", "STORY,", "PRAISED", "EARLY", "SIGN", "DRAMATIC", "SKILL", "PLAY", "ASCRIBES", "DIFFERENT", "POETIC", "FORMS", "DIFFERENT", "CHARACTERS,", "SOMETIMES", "CHANGING", "CHARACTER", "DEVELOPS", "EXAMPLE", "GROWS", "MORE", "ADEPT", "SONNET", "COURSE", "BEEN", "ADAPTED", "NUMEROUS", "TIMES", "STAGE,", "FILM,", "MUSICAL", "OPERA", "DURING", "RESTORATION", "REVIVED", "HEAVILY", "REVISED", "ALSO", "MODIFIED", "SEVERAL", "SCENES,", "REMOVING", "MATERIAL", "CONSIDERED", "INDECENT", "OPERATIC", "ADAPTATION", "OMITTED", "MUCH", "ACTION", "ADDED", "HAPPY", "ENDING", "PERFORMANCES", "CENTURY,", "INCLUDING", "RESTORED", "ORIGINAL", "TEXT", "FOCUSED", "GREATER", "REALISM", "VERSION", "KEPT", "VERY", "CLOSE", "USED", "COSTUMES", "STAGING", "DRAMA", "VERSIONS", "DIVERSE", "COMPARATIVELY", "FAITHFUL"];
+      var word = "";
+      var rightChars = ""; //Here I store which characters have been guessed correctly
+
+      function Try() {
+        if (word.indexOf(guess.value.charAt(0).toUpperCase()) == -1) { //check if word has the character guessed
+          //no update the structure
+          hangman.innerHTML = structure[i];
+          if (i < 8) { //was last step?
+            //no update wrong guessed letters 
+            wrongLetters.innerHTML = wrongLetters.innerHTML + guess.value.charAt(0);
+            i++;
+          }
+          else { //yes end game
+            alert("you are DEAD! btw the word was " + word);
+            window.location.reload(0);
+          }
+        } else {
+          //yes update right guessed letters
+          rightChars = rightChars + guess.value.charAt(0).toUpperCase();
+          var displayWord = "";
+          for (var c = 0; c < word.length; c++) { //for every character in the word
+            if (rightChars.indexOf(word.charAt(c).toUpperCase()) == -1) //check if it was guessed
+            	displayWord = displayWord + " - "; //no hide it
+            else 
+            	displayWord = displayWord + " " + word.charAt(c) + " "; //yes display it
+          }
+          document.getElementById("word").innerHTML = displayWord;
+          if (displayWord.indexOf('-') == -1) {
+            //If there are no hidden letters the player won
+            alert("Congrats you WIN!");
+            window.location.reload(0);
+          }
+        }
+        guess.value = "";
+      }
+
+      function init() { //initialize the game
+        word = words[Math.floor(Math.random() * words.length)]; //choose a word from the dictionary
+        var displayWord = "";
+        for (var c = 0; c < word.length; c++)
+        	  displayWord = displayWord + " - ";
+        document.getElementById("word").innerHTML = displayWord; //show hidden word
+      }
+    </SCRIPT>
+  </HEAD>
+  <BODY>
+    Let's play hangman, make a guess
+    <br>
+    <INPUT TYPE="text" id="guess">
+    <INPUT TYPE="button" Value="Try" onClick="Try()">
+    <div id="hangman">    </div>
+    <br>
+    <div id="word">    </div>
+    <br>
+    <div id="wrongLetters">    </div>
+    <br>
+    <script LANGUAGE="JavaScript">
+      init(); //This calls the init function as soon as the page is loaded  
+    </script>
+  </BODY>
+
+</HTML>
